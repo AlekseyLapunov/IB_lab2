@@ -20,8 +20,9 @@ void MainWindow::sendFromAlice()
     {
         ui->Bob_TE->setPlainText(ui->Alice_TE->toPlainText());
         ui->Alice_TE->clear();
-        ui->statusbar->showMessage("Alice: Bob received my \"N\" and public key.", 2000);
-    } else ui->statusbar->showMessage("Alice: Nothing to send", 2000);
+    }
+    Bob_knows = true;
+    ui->statusbar->showMessage("Alice: Bob received my \"N\" and public key.", 2000);
 }
 
 void MainWindow::sendFromBob()
@@ -30,33 +31,41 @@ void MainWindow::sendFromBob()
     {
         ui->Alice_TE->setPlainText(ui->Bob_TE->toPlainText());
         ui->Bob_TE->clear();
-        ui->statusbar->showMessage("Bob: Alice received my \"N\" and public key.", 2000);
-    } else ui->statusbar->showMessage("Bob: Nothing to send", 2000);
+    }
+    Alice_knows = true;
+    ui->statusbar->showMessage("Bob: Alice received my \"N\" and public key.", 2000);
 }
 
 void MainWindow::sendCFromAlice()
 {
-    ui->Alice_TE->setDisabled(true);
+    if(Alice_knows)
+    {
+        ui->Alice_TE->setDisabled(true);
 
-    ui->Alice_TE->setPlainText(
-                QString::fromStdString(RSA.encode(ui->Alice_TE->toPlainText().toStdString(), RSA_Engine::Alice))
-                );
+        ui->Alice_TE->setPlainText
+                    (
+                       QString::fromStdString(RSA.encode(ui->Alice_TE->toPlainText().toStdString(), RSA_Engine::Alice))
+                    );
 
-    this->sendFromAlice();
-    ui->Alice_TE->setDisabled(false);
+        this->sendFromAlice();
+        ui->Alice_TE->setDisabled(false);
+    } else ui->statusbar->showMessage("Alice: I don't know Bob's \"N\" and public key.", 2000);
 }
 
 void MainWindow::sendCFromBob()
 {
-    ui->Bob_TE->setDisabled(true);
+    if(Bob_knows)
+    {
+        ui->Bob_TE->setDisabled(true);
 
-    ui->Bob_TE->setPlainText
-                (
+        ui->Bob_TE->setPlainText
+                  (
                     QString::fromStdString(RSA.encode(ui->Bob_TE->toPlainText().toStdString(), RSA_Engine::Bob))
-                );
+                  );
 
-    this->sendFromBob();
-    ui->Bob_TE->setDisabled(false);
+        this->sendFromBob();
+        ui->Bob_TE->setDisabled(false);
+    } else ui->statusbar->showMessage("Bob: I don't know Alice's \"N\" and public key.", 2000);
 }
 
 void MainWindow::decodeAlice()
@@ -79,7 +88,6 @@ void MainWindow::decodeBob()
                 (
                     QString::fromStdString(RSA.decode(ui->Bob_TE->toPlainText().toStdString(), RSA_Engine::Bob))
                 );
-
     ui->Bob_TE->setDisabled(false);
 }
 
@@ -97,6 +105,8 @@ void MainWindow::generateKeys()
 void MainWindow::clearForms()
 {
     manageWidgets(false);
+    Alice_knows = false;
+    Bob_knows = false;
 }
 
 void MainWindow::copyBI()

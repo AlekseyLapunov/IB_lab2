@@ -15,7 +15,8 @@ class MainWindow : public QMainWindow
 
     // Ограничитель, являющийся числом, которое не должно превышать никакое из секретных ключей (e),
     // оно создано в тех целях, чтобы избежать переполнения (string)
-    int limiter = 1900;
+    int limiter = 1611;
+    bool Alice_knows = false, Bob_knows = false;
 
 public:
     MainWindow(QWidget *parent = nullptr);
